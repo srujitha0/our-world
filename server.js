@@ -8,60 +8,85 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("."));
 
-const publicKey =
-  "BP-LaULTa60Pu-fDh3VjpnCyT7u5DYxzb7TxzlkbWq0FYYbQN1Sr3eHKj9Mj0LuuxqFzyL4yshSD5qRomwf_M5g";
+const publicKey = process.env.VAPID_PUBLIC_KEY;
+const privateKey = process.env.VAPID_PRIVATE_KEY;
 
-const privateKey = "kk5I_vHaElMqjW9Xnqmq-YSRDBKGTSpc82duP16B8e8";
+if (!publicKey || !privateKey) {
+    console.error("❌ VAPID keys are missing!");
+}
 
 webpush.setVapidDetails(
-  "mailto:srujik710@gmail.com",
-  publicKey,
-  privateKey
+    "mailto:srujik710@gmail.com",
+    publicKey,
+    privateKey
 );
 
 let subscription = null;
 
+// PHONE SUBSCRIPTION
 app.post("/subscribe", (req, res) => {
-  subscription = req.body;
-  console.log("Phone subscribed!");
-  res.json({ success: true });
+    subscription = req.body;
+
+    console.log("📱 Phone subscribed!");
+    console.log("Subscription endpoint:", subscription.endpoint);
+
+    res.json({
+        success: true,
+        message: "Phone subscribed successfully."
+    });
 });
 
+// SEND NOTIFICATION
 app.post("/send-notification", async (req, res) => {
-  if (!subscription) {
-    return res.status(400).json({
-      success: false,
-      message: "No phone is subscribed yet."
-    });
-  }
+    if (!subscription) {
+        return res.status(400).json({
+            success: false,
+            message: "No phone is subscribed yet."
+        });
+    }
 
-  try {
-    await webpush.sendNotification(
-      subscription,
-      JSON.stringify({
-        title: "Our World ❤️",
-        body: "Good morning nanaluuuuu 💕",
-        icon: "/icons/icon-192.png"
-      })
-    );
+    try {
+        await webpush.sendNotification(
+            subscription,
+            JSON.stringify({
+                title: "Our World ❤️",
+                body: "Good morning nanaluuuuu 💕",
+                icon: "/icons/icon-192.png",
+                badge: "/icons/icon-192.png"
+            })
+        );
 
-    res.json({ success: true });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: "Notification failed."
-    });
-  }
+        console.log("🔔 Notification sent successfully!");
+
+        res.json({
+            success: true,
+            message: "Notification sent successfully."
+        });
+
+    } catch (error) {
+        console.error("❌ Notification failed:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Notification failed.",
+            error: error.message
+        });
+    }
 });
 
+// VAPID PUBLIC KEY
 app.get("/vapid-public-key", (req, res) => {
-  res.send(publicKey);
+    res.send(publicKey);
 });
 
-const PORT = 3000;
+// HEALTH CHECK
+app.get("/", (req, res) => {
+    res.send("Our World notification server is running ❤️");
+});
 
+// RENDER PORT
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Our World server running on port ${PORT}`);
+    console.log(`🌎 Our World server running on port ${PORT}`);
 });
