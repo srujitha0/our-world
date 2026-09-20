@@ -21,7 +21,7 @@ async function enablePushNotifications() {
             await navigator.serviceWorker.ready;
 
         const response =
-            await fetch("/vapid-public-key");
+            await fetch("https://our-world-tf5j.onrender.com/vapid-public-key");
 
         const publicKey =
             await response.text();
@@ -38,7 +38,7 @@ async function enablePushNotifications() {
                 });
         }
 
-        await fetch("/subscribe", {
+        await fetch("https://our-world-tf5j.onrender.com/subscribe", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
