@@ -1,4 +1,3 @@
-```js
 const express = require("express");
 const cors = require("cors");
 const webpush = require("web-push");
@@ -128,4 +127,3 @@ app.listen(
         console.log(`🌎 Our World server running on port ${PORT}`);
     }
 );
-```
