@@ -40,7 +40,6 @@ app.post("/subscribe", (req, res) => {
     subscription = req.body;
 
     console.log("📱 Phone subscribed!");
-
     console.log(
         "Subscription endpoint:",
         subscription.endpoint
@@ -54,31 +53,20 @@ app.post("/subscribe", (req, res) => {
 
 
 // ==========================================
-// DIFFERENT MORNING MESSAGES ❤️
+// MORNING MESSAGES
 // ==========================================
 
 const morningNotes = [
-
     "Good morning nanaluuuuu ❤️ Eeroju nee day full happy ga undali.",
-
     "Morning nanaluuuuu 🥹💕 Nuvvu smile chesthe naa morning already perfect.",
-
     "Good morning bangaram ❤️ Time ki tinu, jagratthaga undu.",
-
     "Morning nanaaa 💗 Eeroju kuda nuvvu chala happy ga undali.",
-
     "Good morning moguduuu 😂❤️ Nee pellam nunchi daily attendance!",
-
     "Morning cutieee 🫶 Eeroju em jarigina, remember that I love you.",
-
     "Good morning nanaluuuuu 💕 Nuvvu ekkada unna naa thoughts lo maatram nuvve.",
-
     "Morning bangaram 🥺❤️ Eeroju oka big smile tho start cheyyi.",
-
     "Good morning nana ❤️ Busy ga unna water tagadam marchipoku!",
-
     "Morning nanaluuuuu 🫂💕 Sending you one virtual hug before your day starts."
-
 ];
 
 
@@ -90,12 +78,9 @@ async function sendMorningNotification() {
 
     if (!subscription) {
 
-        console.log(
-            "⚠️ No phone subscription available."
-        );
+        console.log("⚠️ No phone subscription available.");
 
         return;
-
     }
 
     const noteIndex =
@@ -109,47 +94,22 @@ async function sendMorningNotification() {
         await webpush.sendNotification(
             subscription,
             JSON.stringify({
-
                 title: "Our World ❤️",
-
                 body: message,
-
                 icon: "/icons/icon-192.png",
-
                 badge: "/icons/icon-192.png"
-
             })
         );
 
-        console.log(
-            "🌅 AUTOMATIC NOTIFICATION SENT!"
-        );
-
-        console.log(
-            "💌 Message:",
-            message
-        );
+        console.log("🌅 AUTOMATIC NOTIFICATION SENT!");
+        console.log("💌 Message:", message);
 
     } catch (error) {
 
-        console.error(
-            "❌ NOTIFICATION FAILED"
-        );
-
-        console.error(
-            "Status:",
-            error.statusCode
-        );
-
-        console.error(
-            "Message:",
-            error.message
-        );
-
-        console.error(
-            "Body:",
-            error.body
-        );
+        console.error("❌ NOTIFICATION FAILED");
+        console.error("Status:", error.statusCode);
+        console.error("Message:", error.message);
+        console.error("Body:", error.body);
 
     }
 }
@@ -159,33 +119,27 @@ async function sendMorningNotification() {
 // MANUAL TEST ENDPOINT
 // ==========================================
 
-app.post(
-    "/send-notification",
-    async (req, res) => {
+app.post("/send-notification", async (req, res) => {
 
-        await sendMorningNotification();
+    await sendMorningNotification();
 
-        res.json({
-            success: true,
-            message: "Notification test triggered."
-        });
+    res.json({
+        success: true,
+        message: "Notification test triggered."
+    });
 
-    }
-);
+});
 
 
 // ==========================================
 // VAPID PUBLIC KEY
 // ==========================================
 
-app.get(
-    "/vapid-public-key",
-    (req, res) => {
+app.get("/vapid-public-key", (req, res) => {
 
-        res.send(publicKey);
+    res.send(publicKey);
 
-    }
-);
+});
 
 
 // ==========================================
@@ -202,18 +156,17 @@ app.get("/", (req, res) => {
 
 
 // ==========================================
-// AUTOMATIC TEST
-// 9:46 PM IST
+// AUTOMATIC TEST — 9:50 PM IST
 // ==========================================
 
 cron.schedule(
 
-    "46 21 * * *",
+    "50 21 * * *",
 
     async () => {
 
         console.log(
-            "🔔 9:46 PM AUTOMATIC TEST STARTED!"
+            "🔔 9:50 PM AUTOMATIC TEST STARTED!"
         );
 
         await sendMorningNotification();
@@ -227,7 +180,7 @@ cron.schedule(
 );
 
 console.log(
-    "⏰ Automatic test scheduled for 9:46 PM IST."
+    "⏰ Automatic test scheduled for 9:50 PM IST."
 );
 
 
