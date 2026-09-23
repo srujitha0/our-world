@@ -11,8 +11,7 @@ app.use(express.static("."));
 
 
 // ==========================================
-// VAPID KEYS
-// These come from Render Environment Variables
+// VAPID KEYS FROM RENDER
 // ==========================================
 
 const publicKey = process.env.VAPID_PUBLIC_KEY;
@@ -20,6 +19,7 @@ const privateKey = process.env.VAPID_PRIVATE_KEY;
 
 if (!publicKey || !privateKey) {
     console.error("❌ VAPID keys are missing!");
+    process.exit(1);
 }
 
 webpush.setVapidDetails(
@@ -40,6 +40,7 @@ app.post("/subscribe", (req, res) => {
     subscription = req.body;
 
     console.log("📱 Phone subscribed!");
+
     console.log(
         "Subscription endpoint:",
         subscription.endpoint
@@ -53,7 +54,7 @@ app.post("/subscribe", (req, res) => {
 
 
 // ==========================================
-// MORNING MESSAGES ❤️
+// DIFFERENT MORNING MESSAGES ❤️
 // ==========================================
 
 const morningNotes = [
@@ -62,7 +63,7 @@ const morningNotes = [
 
     "Morning nanaluuuuu 🥹💕 Nuvvu smile chesthe naa morning already perfect.",
 
-    "Good morning bangaram ❤️ Time ki tinu, jagratthaga undu, and have a beautiful day.",
+    "Good morning bangaram ❤️ Time ki tinu, jagratthaga undu.",
 
     "Morning nanaaa 💗 Eeroju kuda nuvvu chala happy ga undali.",
 
@@ -89,7 +90,9 @@ async function sendMorningNotification() {
 
     if (!subscription) {
 
-        console.log("⚠️ No phone subscription available.");
+        console.log(
+            "⚠️ No phone subscription available."
+        );
 
         return;
 
@@ -104,9 +107,7 @@ async function sendMorningNotification() {
     try {
 
         await webpush.sendNotification(
-
             subscription,
-
             JSON.stringify({
 
                 title: "Our World ❤️",
@@ -118,27 +119,39 @@ async function sendMorningNotification() {
                 badge: "/icons/icon-192.png"
 
             })
-
         );
 
-        console.log("🌅 AUTOMATIC NOTIFICATION SENT!");
+        console.log(
+            "🌅 AUTOMATIC NOTIFICATION SENT!"
+        );
 
-        console.log("💌 Message:", message);
+        console.log(
+            "💌 Message:",
+            message
+        );
+
+    } catch (error) {
+
+        console.error(
+            "❌ NOTIFICATION FAILED"
+        );
+
+        console.error(
+            "Status:",
+            error.statusCode
+        );
+
+        console.error(
+            "Message:",
+            error.message
+        );
+
+        console.error(
+            "Body:",
+            error.body
+        );
 
     }
-
-    catch (error) {
-
-        console.error("❌ NOTIFICATION FAILED");
-
-        console.error("Status:", error.statusCode);
-
-        console.error("Message:", error.message);
-
-        console.error("Body:", error.body);
-
-    }
-
 }
 
 
@@ -146,34 +159,37 @@ async function sendMorningNotification() {
 // MANUAL TEST ENDPOINT
 // ==========================================
 
-app.post("/send-notification", async (req, res) => {
+app.post(
+    "/send-notification",
+    async (req, res) => {
 
-    await sendMorningNotification();
+        await sendMorningNotification();
 
-    res.json({
+        res.json({
+            success: true,
+            message: "Notification test triggered."
+        });
 
-        success: true,
-
-        message: "Notification test triggered."
-
-    });
-
-});
+    }
+);
 
 
 // ==========================================
 // VAPID PUBLIC KEY
 // ==========================================
 
-app.get("/vapid-public-key", (req, res) => {
+app.get(
+    "/vapid-public-key",
+    (req, res) => {
 
-    res.send(publicKey);
+        res.send(publicKey);
 
-});
+    }
+);
 
 
 // ==========================================
-// HOME / HEALTH CHECK
+// HOME
 // ==========================================
 
 app.get("/", (req, res) => {
@@ -187,17 +203,17 @@ app.get("/", (req, res) => {
 
 // ==========================================
 // AUTOMATIC TEST
-// 9:20 PM IST TODAY
+// 9:46 PM IST
 // ==========================================
 
 cron.schedule(
 
-    "20 21 * * *",
+    "46 21 * * *",
 
     async () => {
 
         console.log(
-            "🔔 9:20 PM AUTOMATIC TEST STARTED!"
+            "🔔 9:46 PM AUTOMATIC TEST STARTED!"
         );
 
         await sendMorningNotification();
@@ -211,7 +227,7 @@ cron.schedule(
 );
 
 console.log(
-    "⏰ Automatic test scheduled for 9:20 PM IST."
+    "⏰ Automatic test scheduled for 9:46 PM IST."
 );
 
 
