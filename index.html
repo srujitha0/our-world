@@ -4324,10 +4324,9 @@ if (
 .card-birthday{background:linear-gradient(145deg,rgba(20,130,180,.45),rgba(20,45,100,.5))}.birthday-card-overlay{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(2,15,35,.76);backdrop-filter:blur(15px);overflow:hidden}.birthday-card-overlay.hidden{display:none}.birthday-card-popup{position:relative;width:100%;max-width:430px;max-height:88vh;overflow:auto;padding:30px 25px 34px;border-radius:32px;text-align:center;color:#fff;background:linear-gradient(180deg,rgba(8,75,120,.94),rgba(3,30,65,.97));border:1px solid rgba(150,225,255,.3);box-shadow:0 30px 90px rgba(0,0,0,.5);animation:oceanIn .5s ease}.birthday-card-popup:after{content:"🌊  🫧  🌊  🫧  🌊";display:block;margin-top:22px;opacity:.55;letter-spacing:7px}.birthday-close{position:absolute;right:15px;top:12px;width:36px;height:36px;border:0;border-radius:50%;background:rgba(255,255,255,.1);color:#fff;font-size:25px;cursor:pointer}.ocean-moon{font-size:42px}.birthday-wave{font-size:48px;margin-top:-5px}.birthday-date{font-size:10px;letter-spacing:3px;opacity:.65;margin:8px 0}.birthday-card-popup h2{font-size:29px;line-height:1.25;margin:14px 0 18px}.birthday-card-popup h2 span{color:#bceeff}.birthday-card-popup p{font-size:14px;line-height:1.7;opacity:.9}.dive-button{margin-top:20px;padding:13px 23px;border:1px solid rgba(170,235,255,.35);border-radius:25px;background:rgba(80,190,230,.18);color:#fff;cursor:pointer;font-size:14px}.birthday-surprise{margin-top:20px;padding:20px;border-radius:22px;background:rgba(0,180,230,.12);border:1px solid rgba(170,235,255,.18)}.birthday-surprise.hidden{display:none}.big-19{font-size:54px;font-weight:bold;margin-bottom:8px}@keyframes oceanIn{from{opacity:0;transform:translateY(30px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
 </style>
 <script>
+
 function openBirthdayCard() {
-    document
-        .getElementById("birthdayCardOverlay")
-        .classList.remove("hidden");
+    window.location.href = "birthday.html";
 }
 function closeBirthdayCard(){document.getElementById('birthdayCardOverlay').classList.add('hidden')}
 function showBirthdaySurprise(){document.getElementById('birthdaySurprise').classList.remove('hidden')}
