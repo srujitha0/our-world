@@ -831,6 +831,122 @@ h1 {
 }
 
 
+
+/* =====================================================
+   WEATHER CARD — LOCATION BASED
+===================================================== */
+
+.weather-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(3,7,18,.62);
+    backdrop-filter: blur(14px);
+}
+
+.weather-modal.show {
+    display: flex;
+    animation: weatherFade .35s ease;
+}
+
+@keyframes weatherFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.weather-box {
+    width: 100%;
+    max-width: 390px;
+    padding: 30px 24px;
+    border-radius: 30px;
+    text-align: center;
+    color: white;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(70,155,220,.42),
+            rgba(20,45,90,.55)
+        );
+    border: 1px solid rgba(255,255,255,.22);
+    box-shadow: 0 25px 70px rgba(0,0,0,.4);
+    backdrop-filter: blur(22px);
+    animation: weatherBox .4s ease;
+}
+
+@keyframes weatherBox {
+    from {
+        transform: translateY(25px) scale(.94);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.weather-icon {
+    font-size: 64px;
+    margin-bottom: 10px;
+}
+
+.weather-location {
+    font-size: 14px;
+    opacity: .72;
+    margin-bottom: 8px;
+}
+
+.weather-temperature {
+    font-size: 55px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.weather-condition {
+    font-size: 18px;
+    margin-bottom: 18px;
+}
+
+.weather-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.weather-detail {
+    padding: 12px 8px;
+    border-radius: 16px;
+    background: rgba(255,255,255,.09);
+    font-size: 12px;
+}
+
+.weather-detail strong {
+    display: block;
+    font-size: 15px;
+    margin-bottom: 3px;
+}
+
+.weather-message {
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: .78;
+    margin-bottom: 20px;
+}
+
+.weather-close {
+    padding: 11px 25px;
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,.22);
+    background: rgba(0,0,0,.18);
+    color: white;
+    cursor: pointer;
+}
+
+
 /* =====================================================
    BACK BUTTON
 ===================================================== */
@@ -2209,7 +2325,7 @@ h1 {
 
             <button class="option-card card-weather"
                     type="button"
-                    onclick="showComingSoon('Weather')">
+                    onclick="openWeather()">
 
                 <div class="shine"></div>
 
@@ -4273,6 +4389,274 @@ function createScreenHeartBurst() {
 }
 
 
+
+/* =====================================================
+   LOCATION BASED WEATHER
+===================================================== */
+
+function openWeather() {
+    const modal = document.getElementById("weatherModal");
+
+    modal.classList.add("show");
+
+    document.getElementById("weatherLocation").textContent =
+        "Finding your location...";
+
+    document.getElementById("weatherTemperature").textContent =
+        "--°C";
+
+    document.getElementById("weatherCondition").textContent =
+        "Loading weather...";
+
+    document.getElementById("weatherMessage").textContent =
+        "Checking the weather wherever you are ❤️";
+
+    if (!navigator.geolocation) {
+        showWeatherError(
+            "Your browser does not support location."
+        );
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        getWeatherForLocation,
+        function() {
+            showWeatherError(
+                "Please allow location access to see your weather."
+            );
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000
+        }
+    );
+}
+
+function closeWeather() {
+    document
+        .getElementById("weatherModal")
+        .classList.remove("show");
+}
+
+async function getWeatherForLocation(position) {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+
+    try {
+        const weatherResponse = await fetch(
+            "https://api.open-meteo.com/v1/forecast?" +
+            "latitude=" + latitude +
+            "&longitude=" + longitude +
+            "&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m" +
+            "&hourly=precipitation_probability" +
+            "&forecast_days=1" +
+            "&timezone=auto"
+        );
+
+        if (!weatherResponse.ok) {
+            throw new Error("Weather request failed.");
+        }
+
+        const weather = await weatherResponse.json();
+
+        let locationName = "Your current location";
+
+        try {
+            const geoResponse = await fetch(
+                "https://geocoding-api.open-meteo.com/v1/search?" +
+                "name=Kompally&count=1&language=en&format=json"
+            );
+
+            if (geoResponse.ok) {
+                const geo = await geoResponse.json();
+
+                // Only use the reverse-location coordinates for matching
+                // when available; otherwise keep the safe generic label.
+                if (geo.results && geo.results.length) {
+                    const distance =
+                        Math.abs(geo.results[0].latitude - latitude) +
+                        Math.abs(geo.results[0].longitude - longitude);
+
+                    if (distance < 0.2) {
+                        locationName = "Kompally, Hyderabad";
+                    }
+                }
+            }
+        } catch (_) {
+            // Weather still works if the location-name lookup fails.
+        }
+
+        const current = weather.current;
+        const hourly = weather.hourly;
+
+        const temperature = Math.round(current.temperature_2m);
+        const feels = Math.round(current.apparent_temperature);
+        const humidity = current.relative_humidity_2m;
+        const wind = Math.round(current.wind_speed_10m);
+
+        let rainChance = 0;
+
+        if (
+            hourly &&
+            hourly.precipitation_probability &&
+            hourly.precipitation_probability.length
+        ) {
+            const currentHour =
+                new Date().getHours();
+
+            rainChance =
+                hourly.precipitation_probability[
+                    Math.min(
+                        currentHour,
+                        hourly.precipitation_probability.length - 1
+                    )
+                ] || 0;
+        }
+
+        const weatherInfo =
+            getWeatherDescription(current.weather_code);
+
+        document.getElementById("weatherIcon").textContent =
+            weatherInfo.icon;
+
+        document.getElementById("weatherLocation").textContent =
+            "📍 " + locationName;
+
+        document.getElementById("weatherTemperature").textContent =
+            temperature + "°C";
+
+        document.getElementById("weatherCondition").textContent =
+            weatherInfo.text;
+
+        document.getElementById("weatherFeels").textContent =
+            feels + "°C";
+
+        document.getElementById("weatherHumidity").textContent =
+            humidity + "%";
+
+        document.getElementById("weatherWind").textContent =
+            wind + " km/h";
+
+        document.getElementById("weatherRain").textContent =
+            rainChance + "%";
+
+        document.getElementById("weatherMessage").textContent =
+            getWeatherMessage(temperature);
+
+    } catch (error) {
+        console.error("Weather error:", error);
+
+        showWeatherError(
+            "Couldn't load the weather right now."
+        );
+    }
+}
+
+function showWeatherError(message) {
+    document.getElementById("weatherIcon").textContent =
+        "🌤️";
+
+    document.getElementById("weatherLocation").textContent =
+        "Weather";
+
+    document.getElementById("weatherTemperature").textContent =
+        "--°C";
+
+    document.getElementById("weatherCondition").textContent =
+        message;
+
+    document.getElementById("weatherMessage").textContent =
+        "Try opening Weather again and allowing location access ❤️";
+}
+
+function getWeatherDescription(code) {
+    if (code === 0) {
+        return {
+            icon: "☀️",
+            text: "Clear sky"
+        };
+    }
+
+    if (code === 1 || code === 2) {
+        return {
+            icon: "🌤️",
+            text: "Partly cloudy"
+        };
+    }
+
+    if (code === 3) {
+        return {
+            icon: "☁️",
+            text: "Cloudy"
+        };
+    }
+
+    if (code >= 45 && code <= 48) {
+        return {
+            icon: "🌫️",
+            text: "Foggy"
+        };
+    }
+
+    if (code >= 51 && code <= 57) {
+        return {
+            icon: "🌦️",
+            text: "Drizzle"
+        };
+    }
+
+    if (code >= 61 && code <= 67) {
+        return {
+            icon: "🌧️",
+            text: "Rain"
+        };
+    }
+
+    if (code >= 71 && code <= 77) {
+        return {
+            icon: "🌨️",
+            text: "Snow"
+        };
+    }
+
+    if (code >= 80 && code <= 82) {
+        return {
+            icon: "🌦️",
+            text: "Rain showers"
+        };
+    }
+
+    if (code >= 95) {
+        return {
+            icon: "⛈️",
+            text: "Thunderstorm"
+        };
+    }
+
+    return {
+        icon: "🌤️",
+        text: "Weather update"
+    };
+}
+
+function getWeatherMessage(temperature) {
+    if (temperature >= 35) {
+        return "It's really hot there 😭 Stay hydrated, nanaluuuuu ❤️";
+    }
+
+    if (temperature >= 30) {
+        return "It's warm there ☀️ Take care and drink some water, nanaluuuuu ❤️";
+    }
+
+    if (temperature >= 20) {
+        return "Looks comfortable there 🌤️ Have a lovely day, nanaluuuuu ❤️";
+    }
+
+    return "It's a little cool there 🥺 Stay warm, nanaluuuuu ❤️";
+}
+
+
 /* =====================================================
    PWA SERVICE WORKER
 ===================================================== */
@@ -4316,6 +4700,65 @@ if (
 }
 
 </script>
+
+
+
+<!-- =====================================================
+     WEATHER MODAL
+===================================================== -->
+
+<div id="weatherModal" class="weather-modal">
+    <div class="weather-box">
+
+        <div id="weatherIcon" class="weather-icon">🌤️</div>
+
+        <div id="weatherLocation" class="weather-location">
+            Finding your location...
+        </div>
+
+        <div id="weatherTemperature" class="weather-temperature">
+            --°C
+        </div>
+
+        <div id="weatherCondition" class="weather-condition">
+            Loading weather...
+        </div>
+
+        <div class="weather-details">
+            <div class="weather-detail">
+                <strong id="weatherFeels">--°C</strong>
+                Feels like
+            </div>
+
+            <div class="weather-detail">
+                <strong id="weatherHumidity">--%</strong>
+                Humidity
+            </div>
+
+            <div class="weather-detail">
+                <strong id="weatherWind">-- km/h</strong>
+                Wind
+            </div>
+
+            <div class="weather-detail">
+                <strong id="weatherRain">--%</strong>
+                Rain chance
+            </div>
+        </div>
+
+        <div id="weatherMessage" class="weather-message">
+            Checking the weather wherever you are ❤️
+        </div>
+
+        <button
+            class="weather-close"
+            type="button"
+            onclick="closeWeather()">
+            Back to Our World
+        </button>
+
+    </div>
+</div>
 
 
 </body>
