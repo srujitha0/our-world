@@ -1,0 +1,649 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>19 Years of You 🌊</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Georgia,serif;
+    background:#031b2e;
+    color:white;
+}
+
+.birthday-world{
+    position:relative;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 50% 15%,rgba(70,210,255,.28),transparent 28%),
+        linear-gradient(180deg,#06182d 0%,#063b59 48%,#021c31 100%);
+}
+
+.screen{
+    position:absolute;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:25px;
+    opacity:0;
+    pointer-events:none;
+    transform:scale(1.04);
+    transition:opacity .7s ease,transform .7s ease;
+}
+
+.screen.active{
+    opacity:1;
+    pointer-events:auto;
+    transform:scale(1);
+}
+
+.ocean-glow{
+    position:absolute;
+    width:500px;
+    height:500px;
+    border-radius:50%;
+    background:rgba(39,207,255,.13);
+    filter:blur(70px);
+    top:-180px;
+    left:50%;
+    transform:translateX(-50%);
+}
+
+.moon{
+    position:absolute;
+    top:9%;
+    right:12%;
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    background:#eaffff;
+    box-shadow:0 0 35px rgba(180,245,255,.9);
+}
+
+.moon:after{
+    content:"";
+    position:absolute;
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    background:#06182d;
+    left:25px;
+    top:-8px;
+}
+
+.lighthouse{
+    position:absolute;
+    left:9%;
+    bottom:18%;
+    width:34px;
+    height:150px;
+    background:linear-gradient(90deg,#d8f9ff,#6598ad,#eaffff);
+    border-radius:5px;
+}
+
+.lighthouse:before{
+    content:"";
+    position:absolute;
+    width:50px;
+    height:35px;
+    left:-8px;
+    top:-25px;
+    background:#b9f5ff;
+    border-radius:7px 7px 2px 2px;
+    box-shadow:0 0 30px #7cecff;
+}
+
+.content{
+    position:relative;
+    z-index:5;
+    width:min(500px,92vw);
+    text-align:center;
+}
+
+.glass{
+    background:rgba(3,36,58,.55);
+    border:1px solid rgba(170,245,255,.35);
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.45),
+        inset 0 0 30px rgba(100,220,255,.08);
+    backdrop-filter:blur(14px);
+    border-radius:30px;
+    padding:35px 25px;
+}
+
+.kicker{
+    letter-spacing:4px;
+    font-size:12px;
+    color:#9cecff;
+    text-transform:uppercase;
+    margin-bottom:15px;
+}
+
+h1{
+    font-size:clamp(40px,11vw,70px);
+    line-height:.95;
+    margin-bottom:20px;
+    text-shadow:0 0 20px rgba(123,230,255,.45);
+}
+
+h2{
+    font-size:clamp(28px,8vw,48px);
+    margin-bottom:20px;
+}
+
+p{
+    line-height:1.7;
+    color:#d9f8ff;
+}
+
+button{
+    margin-top:28px;
+    border:1px solid rgba(150,240,255,.5);
+    background:rgba(56,198,235,.16);
+    color:white;
+    padding:15px 30px;
+    border-radius:999px;
+    font-size:16px;
+    cursor:pointer;
+    box-shadow:0 0 25px rgba(54,215,255,.15);
+    transition:.3s;
+}
+
+button:hover{
+    transform:translateY(-3px);
+    background:rgba(66,211,247,.28);
+    box-shadow:0 0 35px rgba(54,215,255,.4);
+}
+
+.bubbles span{
+    position:absolute;
+    bottom:-40px;
+    width:10px;
+    height:10px;
+    border:1px solid rgba(190,250,255,.6);
+    border-radius:50%;
+    animation:rise linear infinite;
+}
+
+.bubbles span:nth-child(1){left:8%;animation-duration:8s}
+.bubbles span:nth-child(2){left:20%;animation-duration:11s;animation-delay:2s}
+.bubbles span:nth-child(3){left:35%;animation-duration:7s;animation-delay:1s}
+.bubbles span:nth-child(4){left:50%;animation-duration:12s;animation-delay:3s}
+.bubbles span:nth-child(5){left:68%;animation-duration:9s;animation-delay:1s}
+.bubbles span:nth-child(6){left:83%;animation-duration:13s;animation-delay:4s}
+
+@keyframes rise{
+    from{transform:translateY(0);opacity:0}
+    15%{opacity:.8}
+    to{transform:translateY(-110vh);opacity:0}
+}
+
+/* SCREEN 2 */
+
+.cake{
+    position:relative;
+    width:230px;
+    height:170px;
+    margin:10px auto 25px;
+}
+
+.cake-base{
+    position:absolute;
+    bottom:15px;
+    left:20px;
+    width:190px;
+    height:90px;
+    border-radius:20px 20px 30px 30px;
+    background:linear-gradient(180deg,#67dcff,#11688b);
+    box-shadow:0 15px 30px rgba(0,0,0,.4);
+}
+
+.cake-top{
+    position:absolute;
+    top:40px;
+    left:20px;
+    width:190px;
+    height:45px;
+    border-radius:50%;
+    background:#a8f1ff;
+    box-shadow:0 0 25px rgba(130,239,255,.45);
+}
+
+.number{
+    position:absolute;
+    top:55px;
+    left:0;
+    right:0;
+    z-index:4;
+    font-size:55px;
+    font-weight:bold;
+    color:#07304a;
+}
+
+.candle{
+    position:absolute;
+    top:0;
+    width:12px;
+    height:45px;
+    background:#f3ffff;
+    border-radius:5px;
+}
+
+.candle.one{left:82px}
+.candle.two{left:135px}
+
+.flame{
+    position:absolute;
+    top:-20px;
+    left:-3px;
+    width:18px;
+    height:23px;
+    border-radius:50% 50% 50% 50%;
+    background:#fff5a3;
+    box-shadow:0 0 18px #fff0a0;
+    animation:flicker .5s infinite alternate;
+}
+
+@keyframes flicker{
+    from{transform:scale(.85) rotate(-3deg)}
+    to{transform:scale(1.08) rotate(3deg)}
+}
+
+.whale{
+    font-size:70px;
+    margin-bottom:5px;
+    filter:drop-shadow(0 0 15px rgba(90,220,255,.5));
+    animation:float 3s ease-in-out infinite;
+}
+
+@keyframes float{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-12px)}
+}
+
+/* SCREEN 3 */
+
+.letter{
+    text-align:left;
+    background:#eafcff;
+    color:#12384b;
+    border-radius:12px;
+    padding:30px 24px;
+    transform:rotate(-1deg);
+    box-shadow:0 20px 50px rgba(0,0,0,.45);
+}
+
+.letter h3{
+    text-align:center;
+    margin-bottom:18px;
+    color:#17627d;
+}
+
+.letter p{
+    color:#285469;
+    line-height:1.8;
+}
+
+/* SCREEN 4 */
+
+.reason-number{
+    font-size:14px;
+    letter-spacing:4px;
+    color:#85eaff;
+    margin-bottom:20px;
+}
+
+.reason{
+    min-height:150px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:25px;
+    line-height:1.5;
+}
+
+.nav{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+}
+
+.nav button{
+    margin-top:18px;
+    width:55px;
+    height:45px;
+    padding:0;
+}
+
+/* SCREEN 5 */
+
+.final-wave{
+    font-size:70px;
+    margin-bottom:20px;
+    animation:float 4s ease-in-out infinite;
+}
+
+.close{
+    margin-top:30px;
+}
+
+.back{
+    position:fixed;
+    z-index:20;
+    top:18px;
+    left:18px;
+    margin:0;
+    padding:10px 18px;
+    font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="birthday-world">
+
+<div class="ocean-glow"></div>
+<div class="moon"></div>
+<div class="lighthouse"></div>
+
+<div class="bubbles">
+    <span></span><span></span><span></span>
+    <span></span><span></span><span></span>
+</div>
+
+<!-- SCREEN 1 -->
+<section class="screen active" id="birthday1">
+    <div class="content glass">
+        <div class="kicker">a new chapter begins</div>
+
+        <h1>19 Years<br>of You</h1>
+
+        <p>
+            Same ocean.<br>
+            New chapter.
+        </p>
+
+        <p style="margin-top:18px;font-size:18px;">
+            Happy 19th Birthday,<br>
+            <strong>nanaluuuuu ♡</strong>
+        </p>
+
+        <button onclick="birthdayNext(2)">
+            Dive In 🌊
+        </button>
+    </div>
+</section>
+
+<!-- SCREEN 2 -->
+<section class="screen" id="birthday2">
+
+    <button class="back" onclick="birthdayNext(1)">
+        ← Back
+    </button>
+
+    <div class="content glass">
+
+        <div class="whale">🐋</div>
+
+        <div class="cake">
+
+            <div class="candle one">
+                <div class="flame"></div>
+            </div>
+
+            <div class="candle two">
+                <div class="flame"></div>
+            </div>
+
+            <div class="cake-top"></div>
+
+            <div class="number">19</div>
+
+            <div class="cake-base"></div>
+
+        </div>
+
+        <h2>Happy 19th Birthday</h2>
+
+        <p>
+            Make a wish, nanaluuuuu ♡
+        </p>
+
+        <button onclick="blowCandles()">
+            Tap to make a wish ✨
+        </button>
+
+    </div>
+</section>
+
+<!-- SCREEN 3 -->
+<section class="screen" id="birthday3">
+
+    <button class="back" onclick="birthdayNext(2)">
+        ← Back
+    </button>
+
+    <div class="content">
+
+        <div class="letter">
+
+            <h3>A little message from your ocean girl ♡</h3>
+
+            <p>
+                Happy 19th birthday, nanaluuuuu.
+                <br><br>
+
+                I hope this new year of your life brings
+                you everything your heart wishes for.
+                <br><br>
+
+                No matter how big the ocean gets,
+                I will always find my way back to you.
+                <br><br>
+
+                You are one of my favourite parts of this world.
+                <br><br>
+
+                Love you always. ♡
+            </p>
+
+        </div>
+
+        <button onclick="birthdayNext(4)">
+            Tap to continue 🌊
+        </button>
+
+    </div>
+</section>
+
+<!-- SCREEN 4 -->
+<section class="screen" id="birthday4">
+
+    <button class="back" onclick="birthdayNext(3)">
+        ← Back
+    </button>
+
+    <div class="content glass">
+
+        <div class="kicker">
+            just 19 little reasons
+        </div>
+
+        <h2>19 Things I Love About You ♡</h2>
+
+        <div class="reason-number" id="reasonNumber">
+            01 / 19
+        </div>
+
+        <div class="reason" id="reasonText">
+            Your smile.
+        </div>
+
+        <div class="nav">
+            <button onclick="previousReason()">←</button>
+            <button onclick="nextReason()">→</button>
+        </div>
+
+        <button onclick="birthdayNext(5)">
+            One Last Dive 🌙
+        </button>
+
+    </div>
+</section>
+
+<!-- SCREEN 5 -->
+<section class="screen" id="birthday5">
+
+    <button class="back" onclick="birthdayNext(4)">
+        ← Back
+    </button>
+
+    <div class="content glass">
+
+        <div class="final-wave">🌊</div>
+
+        <h2>
+            Somewhere between<br>
+            the waves and the sky...
+        </h2>
+
+        <p style="font-size:20px;margin-top:20px;">
+            I found you. ♡
+        </p>
+
+        <p style="margin-top:18px;">
+            Happy 19th Birthday,<br>
+            <strong>Shalam ♡</strong>
+        </p>
+
+        <button class="close" onclick="closeBirthday()">
+            Close 🌙
+        </button>
+
+    </div>
+</section>
+
+</div>
+
+<script>
+
+const reasons = [
+    "Your smile.",
+    "The way you make me laugh.",
+    "Your caring heart.",
+    "The way you listen to me.",
+    "Your cute little expressions.",
+    "How comfortable I feel with you.",
+    "Your patience with me.",
+    "The way you make ordinary moments special.",
+    "Your voice.",
+    "Your kindness.",
+    "The way you remember little things.",
+    "Your silly side.",
+    "How you make me feel loved.",
+    "Your dreams.",
+    "Your strength.",
+    "The way you are simply you.",
+    "All our little memories.",
+    "The way my world feels better with you.",
+    "Because you are my nanaluuuuu. ♡"
+];
+
+let currentReason = 0;
+
+function birthdayNext(number){
+
+    document
+        .querySelectorAll(".screen")
+        .forEach(function(screen){
+            screen.classList.remove("active");
+        });
+
+    const target =
+        document.getElementById("birthday" + number);
+
+    if(target){
+        target.classList.add("active");
+    }
+
+    if(number === 4){
+        updateReason();
+    }
+}
+
+function updateReason(){
+
+    document.getElementById("reasonNumber").textContent =
+        String(currentReason + 1).padStart(2,"0") + " / 19";
+
+    document.getElementById("reasonText").textContent =
+        reasons[currentReason];
+}
+
+function nextReason(){
+
+    currentReason++;
+
+    if(currentReason >= reasons.length){
+        currentReason = 0;
+    }
+
+    updateReason();
+}
+
+function previousReason(){
+
+    currentReason--;
+
+    if(currentReason < 0){
+        currentReason = reasons.length - 1;
+    }
+
+    updateReason();
+}
+
+function blowCandles(){
+
+    document
+        .querySelectorAll("#birthday2 .flame")
+        .forEach(function(flame){
+            flame.style.animation = "none";
+            flame.style.opacity = "0";
+            flame.style.transform = "scale(.2)";
+        });
+
+    setTimeout(function(){
+
+        alert("Wish made. ✨🌊");
+
+        birthdayNext(3);
+
+    },700);
+}
+
+function closeBirthday(){
+
+    window.location.href = "index.html";
+
+}
+
+</script>
+
+</body>
+</html>
+```
