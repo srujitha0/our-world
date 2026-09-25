@@ -6629,10 +6629,11 @@ if (
 
             navigator
                 .serviceWorker
-                .register("./sw.js")
-
+                .register("./sw.js?v=3")
                 .then(
-                    function() {
+                    function(registration) {
+
+                        registration.update();
 
                         console.log(
                             "Our World PWA is ready!"
@@ -6651,6 +6652,14 @@ if (
 
                     }
                 );
+
+            navigator.serviceWorker.addEventListener(
+                "controllerchange",
+                function() {
+                    window.location.reload();
+                },
+                { once: true }
+            );
 
         }
     );

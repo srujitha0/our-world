@@ -1,4 +1,4 @@
-const CACHE_NAME = "our-world-v2";
+const CACHE_NAME = "our-world-v3";
 
 const FILES_TO_CACHE = [
     "/",
@@ -7,90 +7,220 @@ const FILES_TO_CACHE = [
     "/icons/icon-512.png"
 ];
 
-// INSTALL — cache the PWA files
+
+// =====================================================
+// INSTALL — create the NEW cache
+// =====================================================
+
 self.addEventListener("install", event => {
+
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
             return cache.addAll(FILES_TO_CACHE);
         })
     );
 
+    // Activate the new service worker immediately
     self.skipWaiting();
 });
 
-// ACTIVATE — remove old caches
+
+// =====================================================
+// ACTIVATE — delete ALL old caches
+// =====================================================
+
 self.addEventListener("activate", event => {
+
     event.waitUntil(
-        caches.keys().then(keys =>
-            Promise.all(
+
+        caches.keys().then(keys => {
+
+            return Promise.all(
+
                 keys
                     .filter(key => key !== CACHE_NAME)
                     .map(key => caches.delete(key))
-            )
-        )
+
+            );
+
+        })
+
     );
 
+    // Take control of the page immediately
     self.clients.claim();
 });
 
-// FETCH — use cached files when available
+
+// =====================================================
+// FETCH — ALWAYS GET NEW index.html
+// =====================================================
+
 self.addEventListener("fetch", event => {
+
+    // For page navigation / index.html:
+    // Network first = newest version always loads.
+    if (
+        event.request.mode === "navigate" ||
+        event.request.url.endsWith("/index.html")
+    ) {
+
+        event.respondWith(
+
+            fetch(event.request)
+
+                .then(response => {
+
+                    // Save the newest version into cache
+                    const responseCopy = response.clone();
+
+                    caches.open(CACHE_NAME).then(cache => {
+
+                        cache.put(
+                            event.request,
+                            responseCopy
+                        );
+
+                    });
+
+                    return response;
+
+                })
+
+                .catch(() => {
+
+                    // If internet/server is unavailable,
+                    // use the cached version.
+                    return caches.match(event.request);
+
+                })
+
+        );
+
+        return;
+    }
+
+
+    // =================================================
+    // OTHER FILES — CACHE FIRST
+    // =================================================
+
     event.respondWith(
+
         caches.match(event.request).then(cachedResponse => {
-            return cachedResponse || fetch(event.request);
+
+            return (
+                cachedResponse ||
+                fetch(event.request)
+            );
+
         })
+
     );
+
 });
 
+
+// =====================================================
 // NOTIFICATION CLICK
+// =====================================================
+
 self.addEventListener("notificationclick", event => {
+
     event.notification.close();
 
     event.waitUntil(
+
         clients.matchAll({
+
             type: "window",
             includeUncontrolled: true
+
         }).then(clientList => {
 
             for (const client of clientList) {
+
                 if ("focus" in client) {
                     return client.focus();
                 }
+
             }
 
             if (clients.openWindow) {
                 return clients.openWindow("/");
             }
+
         })
+
     );
+
 });
 
 
+// =====================================================
 // PUSH NOTIFICATION
+// =====================================================
+
 self.addEventListener("push", event => {
+
     console.log("🔥 PUSH EVENT RECEIVED!");
-    
+
     let data = {};
 
     try {
-        data = event.data ? event.data.json() : {};
+
+        data = event.data
+            ? event.data.json()
+            : {};
+
     } catch (error) {
-        console.error("Push data error:", error);
+
+        console.error(
+            "Push data error:",
+            error
+        );
+
     }
 
-    const title = data.title || "Our World ❤️";
+
+    const title =
+        data.title ||
+        "Our World ❤️";
+
 
     const options = {
-        body: data.body || "Good morning nanaluuuuu 💕",
-        icon: data.icon || "/icons/icon-192.png",
-        badge: "/icons/icon-192.png",
-        vibrate: [200, 100, 200],
+
+        body:
+            data.body ||
+            "Good morning nanaluuuuu 💕",
+
+        icon:
+            data.icon ||
+            "/icons/icon-192.png",
+
+        badge:
+            "/icons/icon-192.png",
+
+        vibrate: [
+            200,
+            100,
+            200
+        ],
+
         data: {
             url: "/"
         }
+
     };
 
+
     event.waitUntil(
-        self.registration.showNotification(title, options)
+
+        self.registration.showNotification(
+            title,
+            options
+        )
+
     );
+
 });
